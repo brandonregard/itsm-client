@@ -6,19 +6,30 @@ import 'package:http/http.dart' as http;
 
 class Incident {
   final String number;
-  final String impact;
+  final String state;
+  final String urgency;
 
-  Incident({this.number, this.impact});
+  Incident({this.number, this.state, this.urgency});
 
   factory Incident.fromJson(Map<String, dynamic> json) {
     return Incident(
       number: json['number'],
-      impact: json['impact'],
+      state: json['incident_state'],
+      urgency: json['urgency'],
     );
   }
 }
 
-class IncidentsListView extends StatelessWidget {
+class IncidentsListView extends StatefulWidget {
+  IncidentsListView(this.selectedState);
+
+  final String selectedState;
+
+  @override
+  _IncidentsListViewState createState() => _IncidentsListViewState();
+}
+
+class _IncidentsListViewState extends State<IncidentsListView> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Incident>>(
@@ -36,7 +47,7 @@ class IncidentsListView extends StatelessWidget {
   }
 
   Future<List<Incident>> _fetchIncidents() async {
-    final incidentsUrl = 'https://itsm-server-dev.brandonregard.info/incidents?incident_state=New';
+    final incidentsUrl = 'https://itsm-server-dev.brandonregard.info/incidents?incident_state=' + widget.selectedState;
     final response = await http.get(incidentsUrl);
 
     if (response.statusCode == 200) {
@@ -48,7 +59,7 @@ class IncidentsListView extends StatelessWidget {
         map[item.number] = item;
       }
       list = map.values.toList();
-      list.sort((a, b) => a.impact.compareTo(b.impact));
+      list.sort((a, b) => a.urgency.compareTo(b.urgency));
       return list;
     } else {
       throw Exception('Failed to load incidents from API');
@@ -61,7 +72,7 @@ class IncidentsListView extends StatelessWidget {
         itemBuilder: (context, index) {
           Color color;
 
-          switch (data[index].impact) {
+          switch (data[index].urgency) {
             case '1 - High':
               color = Colors.red[500];
               break;
@@ -74,7 +85,7 @@ class IncidentsListView extends StatelessWidget {
             default:
               color = Colors.blue[500];
           }
-          return _tile(data[index].number, data[index].impact, color);
+          return _tile(data[index].number, data[index].state, color);
         });
   }
 

@@ -22,6 +22,7 @@ environment:
 
 dependencies:
   http: ^0.12.0+2
+  filter_list: ^0.0.5
   flutter:
     sdk: flutter
 
