@@ -1,2 +1,2 @@
 # itsm-client
-Simple ITSM Flutter Web Client
+Simple ITSM Flutter Client
